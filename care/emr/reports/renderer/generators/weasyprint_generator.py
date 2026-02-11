@@ -3,7 +3,6 @@ from typing import Any, Literal
 
 from django.http import HttpResponse
 from pydantic import Field
-from weasyprint import CSS, HTML
 
 from care.emr.reports.renderer.generators.base import BaseOptions, BaseOutputGenerator
 
@@ -21,22 +20,37 @@ class WeasyPrintGenerator(BaseOutputGenerator):
     options_model = WeasyPrintGeneratorOptions
 
     def __init__(self):
-        self.HTML = HTML
-        self.CSS = CSS
+        self._HTML = None
+        self._CSS = None
+
+    def _load_weasyprint(self):
+        if self._HTML is None:
+            try:
+                from weasyprint import CSS, HTML
+                self._HTML = HTML
+                self._CSS = CSS
+            except OSError as e:
+                logger.error("WeasyPrint dependencies not available: %s", e)
+                msg = (
+                    "WeasyPrint requires system libraries (pango, glib, cairo). "
+                    "Please install them: brew install pango glib cairo"
+                )
+                raise ImportError(msg) from e
 
     def generate(
         self, html: str, options: WeasyPrintGeneratorOptions | None = None
     ) -> bytes:
+        self._load_weasyprint()
         options = options or WeasyPrintGeneratorOptions()
         try:
-            html_obj = self.HTML(string=html)
+            html_obj = self._HTML(string=html)
             stylesheets = []
 
             if options.stylesheets:
                 for css_string in options.stylesheets:
-                    stylesheets.append(self.CSS(string=css_string))
+                    stylesheets.append(self._CSS(string=css_string))
             else:
-                stylesheets.append(self.CSS(string=self._get_default_css(options)))
+                stylesheets.append(self._CSS(string=self._get_default_css(options)))
 
             return html_obj.write_pdf(stylesheets=stylesheets)
         except Exception as e:
