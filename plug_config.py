@@ -1,7 +1,16 @@
 import os
+from pathlib import Path
+
+import environ
 
 from plugs.manager import PlugManager
 from plugs.plug import Plug
+
+# Load .env file before reading environment variables
+# This ensures plugin configs can access .env values
+env_file = Path(__file__).resolve().parent / ".env"
+if env_file.exists():
+    environ.Env.read_env(env_file)
 
 # Care Scribe Plugin - Local Development
 scribe_plug = Plug(
@@ -27,6 +36,22 @@ scribe_plug = Plug(
     },
 )
 
-plugs = [scribe_plug]
+
+
+
+
+# Care Scribe Plugin - Local Development
+scribe_auto = Plug(
+    # /Users/jagankumar/Office/Work/repo/care_task_plugin/care_auto_assign
+    name="care_auto_assign",
+    package_name="/Users/jagankumar/Office/Work/repo/care_task_plugin/care_auto_assign",
+    version="",  # Empty for local path
+    configs={
+        "SERVICE_API_KEY": "my_api_key",
+
+    },
+)
+
+plugs = [scribe_plug,scribe_auto]
 
 manager = PlugManager(plugs)
