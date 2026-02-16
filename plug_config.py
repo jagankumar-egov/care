@@ -44,7 +44,7 @@ scribe_plug = Plug(
 scribe_auto = Plug(
     # /Users/jagankumar/Office/Work/repo/care_task_plugin/care_auto_assign
     name="care_auto_assign",
-    package_name="/Users/jagankumar/Office/Work/repo/care_task_plugin/care_auto_assign",
+    package_name="/Users/jagankumar/Office/Work/repo/care_auto_assign/care_auto_assign",
     version="",  # Empty for local path
     configs={
         "SERVICE_API_KEY": "my_api_key",
