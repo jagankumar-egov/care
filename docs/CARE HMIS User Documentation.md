@@ -26,7 +26,7 @@ Optional: Note that technical/implementation staff can use module docs for setup
 
 | Sl No | Module | Primary User Personas | Link to Documentation |
 | ----- | ----- | ----- | :---: |
-| 1 | Hospital Administration  | Facility Admin | [Link](https://docs.google.com/document/d/1wlC_pZo-cdWqa6cohBXXq-snYlp0NPm3TQW3cjhSO9Y/edit?usp=sharing) |
+| 1 | Hospital Administration  | Facility Admin | [Link](https://docs.google.com/document/d/1wlC_pZo-cdWqa6cohBXXq-snYlp0NPm3TQW3cjhSO9Y/edit?usp=sharing) | [Link](https://github.com/jagankumar-egov/care/edit/jagan/docs/CARE%20HMIS%20User%20Documentation.md#:~:text=Clinical-,Module_HMIS_eGov,-.md) |
 | 2 | Scheduling | Facility Admin | [Link](https://docs.google.com/document/d/1mUB0QJLOeMfiS8s0XqGg8giEmSRsTK3yjwdvuYH-NoA/edit?usp=sharing) |
 | 3 | Reception Module | Reception Staff | [Link](https://docs.google.com/document/d/10gQVoX4QOIHHU-zyQRklN9C6Fn65WOSi_5kjJgpizvY/edit?usp=sharing) |
 | 4 | Clinical Module  | Doctor/Nurse | [Link](https://docs.google.com/document/d/1kAPtcTkv7iAdGPDeIIWI76NrPM3akeu3vpttaG9bT38/edit?usp=sharing) |
