@@ -676,6 +676,254 @@ python manage.py load_fixtures
 
 ---
 
+## 10. Fixture Loading & Master Data Templates
+
+### Overview
+
+The CARE system provides two mechanisms for loading clinical master data:
+1. **`load_fixtures.py`** - Python command for programmatic fixture creation
+2. **`PRODUCT_MASTERS.xlsx`** - Excel template for bulk data loading
+
+---
+
+### load_fixtures.py Command
+
+**File:** `care/emr/management/commands/load_fixtures.py`
+
+**Usage:**
+```bash
+python manage.py load_fixtures
+```
+
+**What It Creates:**
+
+| Component | Count | Description |
+|-----------|-------|-------------|
+| SpecimenDefinition | 4 | Blood, Urine, CBC, Lipid specimens |
+| ObservationDefinition | 15+ | Lab tests with LOINC codes and reference ranges |
+| ActivityDefinition | 4 | Orderable test panels |
+| ProductKnowledge | 4 | Sample medications |
+| ChargeItemDefinition | 4+ | Pricing templates |
+| HealthcareService | 2 | Lab and Pharmacy services |
+| Inventory Items | 4 | Sample inventory products |
+
+#### Sample Specimen Definitions
+
+| Title | Type Code | Collection Method | Body Site |
+|-------|-----------|-------------------|-----------|
+| Fasting Blood Glucose | 788707000 (Blood sample) | 82078001 (Venipuncture) | 53120007 (Arm) |
+| CBC | 788707000 (Blood sample) | 82078001 (Venipuncture) | 53120007 (Arm) |
+| Lipid Panel | 788707000 (Blood sample) | 82078001 (Venipuncture) | 53120007 (Arm) |
+| Urinalysis | 122575003 (Urine specimen) | 167217005 (Urine collection) | N/A |
+
+#### Sample Observation Definitions (Lab Tests)
+
+| Test | LOINC Code | Unit | Reference Ranges |
+|------|------------|------|------------------|
+| Fasting Blood Glucose | 1558-6 | mg/dL | Normal: 70-100, Pre-diabetic: 100-126, Diabetic: >126 |
+| Hemoglobin | 718-7 | g/dL | Male: 14-18, Female: 12-16 |
+| WBC Count | 26464-8 | 10*3/uL | 4.5-11.0 |
+| Platelet Count | 777-3 | 10*3/uL | 150-400 |
+| RBC Count | 789-8 | 10*6/uL | Male: 4.7-6.1, Female: 4.2-5.4 |
+| Total Cholesterol | 2093-3 | mg/dL | Desirable: <200, Borderline: 200-239, High: ≥240 |
+| Triglycerides | 2571-8 | mg/dL | Normal: <150, Borderline: 150-199, High: 200-499 |
+| HDL Cholesterol | 2085-9 | mg/dL | Low: <40, Borderline: 40-60, Optimal: >60 |
+| LDL Cholesterol | 2089-1 | mg/dL | Optimal: <100, Borderline: 130-159, High: ≥160 |
+| Urinalysis Panel | LP7681-2 | N/A | Multiple components |
+
+#### Sample Product Knowledge (Medications)
+
+| Medication | SNOMED Code | Dosage Form | Routes |
+|------------|-------------|-------------|--------|
+| Amoxicillin 500mg | 27658006 | Capsule (420161003) | Oral (26643006) |
+| Paracetamol 500mg | 90332006 | Tablet (421026006) | Oral (26643006) |
+| Ibuprofen 400mg | 38268001 | Tablet (421026006) | Oral (26643006) |
+| Disposable Gloves (L) | 52291003 | N/A | N/A |
+
+---
+
+### PRODUCT_MASTERS.xlsx Template
+
+**File:** `docs/PRODUCT_MASTERS.xlsx`
+
+This Excel file serves as a template for bulk-loading clinical master data. It contains 5 sheets:
+
+#### Sheet 1: ActivityDefinition (101 rows)
+
+Defines orderable procedures with SNOMED codes.
+
+**Columns:**
+| Column | Description | Example |
+|--------|-------------|---------|
+| title | Procedure name | "Dressing", "Nebulisation", "Suture removal" |
+| description | Detailed description | - |
+| usage | Usage context | - |
+| code_value | SNOMED procedure code | 3895009, 56251003, 30549001 |
+| code_display | SNOMED display text | "Application of dressing" |
+| healthcare_service | Service slug | "Emergency", "In-Patient Services" |
+| locations | Location slugs | Location codes |
+| diagnostic_report_codes | Report codes | - |
+| specimen_slugs | Required specimens | Specimen slugs |
+| observation_slugs | Related observations | Observation slugs |
+| charge_item_slugs | Pricing templates | ChargeItem slugs |
+
+**Sample Data:**
+
+| Title | Code | Code Display | Healthcare Service |
+|-------|------|--------------|-------------------|
+| Dressing | 3895009 | Application of dressing | Emergency |
+| Subcutaneous Injection | 1285265006 | Injection into subcutaneous tissue | Emergency |
+| Nebulisation | 56251003 | Nebulizer therapy | Emergency |
+| Enema | 61919008 | Giving patient an enema | In-Patient Services |
+| NG tube insertion | 87750000 | Insertion of nasogastric tube | Emergency |
+| Suture removal | 30549001 | Removal of suture | Emergency |
+| Resuscitation | 439569004 | Resuscitation | Emergency |
+| Catheterization | 45211000 | Catheterization | Emergency |
+
+#### Sheet 2: ObservationDefinition (73 rows)
+
+Defines lab test observations with LOINC codes and reference ranges.
+
+**Key Columns:**
+| Column | Description |
+|--------|-------------|
+| title | Test name |
+| slug_value | Unique identifier |
+| code_value | LOINC code |
+| code_display | LOINC display text |
+| code_system | `http://loinc.org` |
+| category | laboratory, vital-signs, etc. |
+| permitted_data_type | Quantity, string, CodeableConcept |
+| qualified_ranges | Reference ranges by context |
+| component_code | For panel components |
+
+**Sample Data:**
+
+| Title | LOINC Code | Code Display |
+|-------|------------|--------------|
+| AFB (24 HRS URINE) | 11480-1 | Microscopic observation in Urine by Acid fast stain |
+| Hemoglobin | 718-7 | Hemoglobin [Mass/volume] in Blood |
+| Total leucocyte count | 26464-8 | Leucocytes in Blood |
+| Platelet count | 777-3 | Platelets [#/volume] in Blood |
+| CBC Test | 58410-2 | Complete blood count panel |
+| ESR | 4537-7 | Erythrocyte Sedimentation Rate |
+| Blood group (ABO) | 883-9 | ABO group [Type] in Blood |
+| Blood group (Rh typing) | 10331-7 | Rh type in blood |
+
+#### Sheet 3: Radiology ActivityDefinition (92 rows)
+
+Defines radiology procedures with SNOMED codes.
+
+**Columns:**
+| Column | Description |
+|--------|-------------|
+| category | Always "Radiology" |
+| title | Test name |
+| slug_value | Unique identifier |
+| code_value | SNOMED procedure code |
+| code_display | SNOMED display text |
+| code_system | `http://snomed.info/sct` |
+| diagnostic_report_codes | Report codes |
+| healthcare_service | "Radiology" |
+
+**Sample Data:**
+
+| Title | Code | Code Display |
+|-------|------|--------------|
+| X-RAY SKULL AP | 55965002 | Plain X-ray of bone of cranium |
+| X-RAY SKULL AP/LAT | 55965002 | Plain X-ray of bone of cranium |
+| X-RAY FACE AP | 1290812008 | Plain X-ray of face |
+| X-RAY MASTOID LAT | 1293029006 | Plain X-ray of mastoid |
+| X-RAY NASAL BONE AP | 1290808002 | Plain X-ray of nasal bone |
+| X-RAY CERVICAL SPINE AP | 712970008 | Plain X-ray of cervical vertebral column |
+| X-RAY THORACIC SPINE | 399061000 | Plain X-ray of thoracic spine |
+| X-RAY CHEST PA | 399208008 | Plain chest X-ray |
+
+#### Sheet 4: Product Knowledge for KA (249 rows)
+
+Karnataka-specific medication formulary with SNOMED codes.
+
+**Columns:**
+| Column | Description |
+|--------|-------------|
+| name | Medication name with strength |
+| product_type | "Medication" |
+| category | "Medication" |
+| display | SNOMED display text |
+| code | SNOMED product code |
+| base_unit | Base unit of measure |
+| status | active/inactive |
+| dosage_form_display | Form (Tablet, Injection, etc.) |
+| dosage_form_code | SNOMED dosage form code |
+| route_display | Administration route |
+| route_code | SNOMED route code |
+| Pack Size | Units per pack |
+
+**Sample Data:**
+
+| Name | SNOMED Code | Dosage Form | Route |
+|------|-------------|-------------|-------|
+| Ketamine Injection 10 mg/ml | 781952002 | Solution for injection | IV, IM |
+| Propofol Injection 10 mg/ml | 782081001 | Solution for injection | IV |
+| Sevoflurane Inhalation | 1285093003 | Solution for inhalation | Inhalation |
+| Bupivacaine 0.5% with Glucose 7.5% | 7621000189103 | Solution for injection | Spinal |
+| Lignocaine Injection 2% | 781967003 | Solution for injection | IV |
+| Lignocaine jelly 2% | 334243009 | Cutaneous gel | Topical |
+| Atropine Injection 0.6 mg/ml | - | Solution for injection | IV |
+| Midazolam Injection 5 mg/ml | 781998001 | Solution for injection | IV, IM |
+| Aceclofenac Tablet 100 mg | 329925006 | Oral Tablet | Oral |
+| Diclofenac Sodium Tablet 50 mg | 374627000 | Oral Tablet | Oral |
+
+#### Sheet 5: T-Rohit (20 rows)
+
+Additional activity definitions for specific procedures.
+
+**Columns:** Similar to ActivityDefinition sheet.
+
+---
+
+### Loading Excel Data
+
+While the Excel template is provided for reference, data loading is typically done through:
+
+1. **Custom import scripts** - Python scripts to parse Excel and create database records
+2. **Admin interface** - Manual entry through Django admin
+3. **API endpoints** - Bulk create via REST API
+
+**Example Import Pattern:**
+```python
+import pandas as pd
+from care.emr.models import ActivityDefinition, ObservationDefinition
+
+def import_activity_definitions(excel_path):
+    df = pd.read_excel(excel_path, sheet_name='ActivityDefinition')
+    for _, row in df.iterrows():
+        ActivityDefinition.objects.create(
+            title=row['title'],
+            code={
+                'code': str(row['code_value']),
+                'display': row['code_display'],
+                'system': 'http://snomed.info/sct'
+            },
+            healthcare_service=get_service(row['healthcare_service']),
+            # ... other fields
+        )
+```
+
+---
+
+### Data Summary by Category
+
+| Category | Source | Template Sheet | Fixture Count | Template Rows |
+|----------|--------|----------------|---------------|---------------|
+| **Lab Tests** | LOINC | ObservationDefinition | 15+ | 73 |
+| **Procedures** | SNOMED | ActivityDefinition | 4 | 101 |
+| **Radiology** | SNOMED | Radiology ActivityDefinition | - | 92 |
+| **Medications** | SNOMED | Product Knowledge for KA | 4 | 249 |
+| **Specimens** | SNOMED | (in fixtures) | 4 | - |
+
+---
+
 ## Summary
 
 The CARE EMR system uses a hybrid approach for clinical master data:
