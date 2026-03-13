@@ -15,7 +15,7 @@ if env_file.exists():
 # Care Scribe Plugin - Local Development
 scribe_plug = Plug(
     name="care_scribe",
-    package_name="/Users/jagankumar/Office/Work/repo/care_scribe",
+    package_name="/Users/jagankumar/Office/Work/repo/Care Platform/Carecare_scribe",
     version="",  # Empty for local path
     configs={
         "SCRIBE_API_PROVIDER": os.environ.get("SCRIBE_API_PROVIDER", "openai"),
@@ -44,7 +44,7 @@ scribe_plug = Plug(
 scribe_auto = Plug(
     # /Users/jagankumar/Office/Work/repo/care_task_plugin/care_auto_assign
     name="care_auto_assign",
-    package_name="/Users/jagankumar/Office/Work/repo/care_auto_assign/care_auto_assign",
+    package_name="/Users/jagankumar/Office/Work/repo/Care Platform/care_auto_assign/care_auto_assign",
     version="",  # Empty for local path
     configs={
         "SERVICE_API_KEY": "my_api_key",
